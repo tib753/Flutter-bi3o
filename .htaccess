@@ -1,0 +1,60 @@
+Options -MultiViews
+RewriteEngine On
+
+# 1. Redirect root to Arabic
+RewriteRule ^index\.html$ /ar/ [L,R=301]
+RewriteRule ^$ /ar/ [L,R=301]
+
+# 2. Serve language entry points
+RewriteRule ^en/?$ en/index.html [L]
+RewriteRule ^fr/?$ fr/index.html [L]
+RewriteRule ^ar/?$ ar/index.html [L]
+
+# 3. Redirect ?lang= to static routes
+RewriteCond %{QUERY_STRING} ^lang=(en|fr|ar)$
+RewriteRule ^(.*)$ /%1/? [L,R=301]
+
+# 4. Support Flutter path strategy for language subpaths
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^/en/
+RewriteRule ^en/.* en/index.html [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^/fr/
+RewriteRule ^fr/.* fr/index.html [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^/ar/
+RewriteRule ^ar/.* ar/index.html [L]
+
+# 5. Fallback to Arabic for unknown paths
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ ar/index.html [L]
+
+# 6. Compression for text-based assets
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml text/javascript application/javascript application/json application/manifest+json application/xml application/xhtml+xml font/woff2 image/svg+xml
+</IfModule>
+
+<IfModule mod_brotli.c>
+  BrotliCompressionQuality 5
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css text/plain text/xml text/javascript application/javascript application/json application/manifest+json application/xml application/xhtml+xml font/woff2 image/svg+xml
+</IfModule>
+
+# 7. Long cache for immutable Flutter assets
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|png|jpg|jpeg|webp|avif|gif|svg|ico|woff|woff2|ttf|json|wasm)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# 8. Ensure critical HTML & service workers are always fresh
+<IfModule mod_headers.c>
+  <FilesMatch "(\.html|flutter_service_worker\.js|firebase-messaging-sw\.js)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+  </FilesMatch>
+</IfModule>
