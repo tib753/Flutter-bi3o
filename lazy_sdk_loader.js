@@ -6,7 +6,7 @@
     facebook: 'https://connect.facebook.net/en_US/sdk.js',
     facebookAppId: '380903914182154',
     facebookVersion: 'v15.0',
-    googleMaps: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBe6uNrQf38NT6AjdSLq23YxFOPM5OnpMs&libraries=places&loading=async',
+    googleMaps: `https://maps.googleapis.com/maps/api/js?key=${window.AppConfig?.googleMapsKey || ''}&libraries=places&loading=async`,
     googleGsi: 'https://accounts.google.com/gsi/client'
   };
 
@@ -117,9 +117,9 @@
       });
     }
   };
-  setupLazyTrigger(() => {
-    loadGoogleMaps().catch((error) => console.warn('Google Maps SDK failed to load', error));
-  });
+// setupLazyTrigger(() => {
+//     loadGoogleMaps().catch((error) => console.warn('Google Maps SDK failed to load', error));
+// });
 
   window.LazySdkLoader = api;
 
